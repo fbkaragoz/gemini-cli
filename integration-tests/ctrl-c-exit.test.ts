@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as os from 'node:os';
-import { TestRig } from './test-helper.js';
+import { TestRig, type InteractiveProcessResult } from './test-helper.js';
 
 describe('Ctrl+C exit', () => {
   it('should exit gracefully on second Ctrl+C', async () => {
@@ -61,7 +61,10 @@ describe('Ctrl+C exit', () => {
       ),
     );
 
-    const result = await Promise.race([promise, timeout]);
+    const result = (await Promise.race([
+      promise,
+      timeout,
+    ])) as InteractiveProcessResult;
 
     // On Windows, killing the process may result in a non-zero exit code. On
     // other platforms, a graceful exit is code 0.
