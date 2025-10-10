@@ -142,6 +142,12 @@ interface ParsedLog {
   }[];
 }
 
+export interface InteractiveProcessResult {
+  exitCode: number;
+  signal?: number;
+  output: string;
+}
+
 export class TestRig {
   bundlePath: string;
   testDir: string | null;
@@ -817,7 +823,7 @@ export class TestRig {
 
   runInteractive(...args: string[]): {
     ptyProcess: pty.IPty;
-    promise: Promise<{ exitCode: number; signal?: number; output: string }>;
+    promise: Promise<InteractiveProcessResult>;
   } {
     const { command, initialArgs } = this._getCommandAndArgs(['--yolo']);
     const commandArgs = [...initialArgs, ...args];
@@ -850,11 +856,7 @@ export class TestRig {
       }
     });
 
-    const promise = new Promise<{
-      exitCode: number;
-      signal?: number;
-      output: string;
-    }>((resolve) => {
+    const promise = new Promise<InteractiveProcessResult>((resolve) => {
       ptyProcess.onExit(({ exitCode, signal }) => {
         resolve({ exitCode, signal, output: this._interactiveOutput });
       });
